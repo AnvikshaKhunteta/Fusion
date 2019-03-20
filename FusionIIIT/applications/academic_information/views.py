@@ -16,7 +16,9 @@ from applications.globals.models import (Designation, ExtraInfo,
 
 from .forms import AcademicTimetableForm, ExamTimetableForm, MinuteForm
 from .models import (Calendar, Course, Exam_timetable, Grades, Instructor,
-                     Meeting, Student, Student_attendance, Timetable)
+                     Meeting, Student, Student_attendance, Timetable,Curriculum)
+
+from django.core.files.storage import FileSystemStorage
 
 
 def homepage(request):
@@ -65,80 +67,115 @@ def homepage(request):
     examTtForm = ExamTimetableForm()
     acadTtForm = AcademicTimetableForm()
     calendar = Calendar.objects.all()
-    opt_courses = Course.objects.all().filter(optional=True)
+    #opt_courses = Course.objects.all().filter(optional=True)
     course_list = sem_for_generate_sheet()
-    get_course_list = Course.objects.all().filter(sem = course_list[0])
-    get_course_list_1 = Course.objects.all().filter(sem = course_list[1])
-    get_course_list_2 = Course.objects.all().filter(sem = course_list[2])
-    get_course_list_3 = Course.objects.all().filter(sem = course_list[3])
+    print (course_list)
+    #get_course_list = Course.objects.all().filter(sem = course_list[0])
+    #get_course_list_1 = Course.objects.all().filter(sem = course_list[1])
+    #get_course_list_2 = Course.objects.all().filter(sem = course_list[2])
+    #get_course_list_3 = Course.objects.all().filter(sem = course_list[3])
 
-    get_courses = list(chain(get_course_list, get_course_list_1, get_course_list_2, get_course_list_3))
-    if(course_list[0]==1):
-        course_list = [2, 4, 6, 8]
-    get_course_list = Course.objects.all().filter(sem = course_list[0])
-    get_course_list_1 = Course.objects.all().filter(sem = course_list[1])
-    get_course_list_2 = Course.objects.all().filter(sem = course_list[2])
-    get_course_list_3 = Course.objects.all().filter(sem = course_list[3])
+    #get_courses = list(chain(get_course_list, get_course_list_1, get_course_list_2, get_course_list_3))
+    #if(course_list[0]==1):
+    #    course_list = [2, 4, 6, 8]
+    #get_course_list = Course.objects.all().filter(sem = course_list[0])
+    #get_course_list_1 = Course.objects.all().filter(sem = course_list[1])
+    #get_course_list_2 = Course.objects.all().filter(sem = course_list[2])
+    #get_course_list_3 = Course.objects.all().filter(sem = course_list[3])
+    w = Curriculum.objects.all().filter(sem=course_list[0])
+    x = Curriculum.objects.all().filter(sem=course_list[1])
+    y = Curriculum.objects.all().filter(sem=course_list[2])
+    z = Curriculum.objects.all().filter(sem=course_list[3])
+    W = chain(w,x,y,z)
+    get_courses = list()
+    for i in W:
+        get_courses.append(i.course_id)
 
-    this_sem_courses = list(chain(get_course_list, get_course_list_1, get_course_list_2, get_course_list_3))
+    
+    this_sem_courses = get_courses
+    #this_sem_courses = Course.objects.all().filter(course_id = get_courses)
+    #get_course_list = Course.objects.all().filter(course_id = (Curriculum.objects.all().filter(sem=course_list[0])))
+    #get_course_list_1 = Course.objects.all().filter(course_id = (Curriculum.objects.all().filter(sem=course_list[1])))
+    #get_course_list_2 = Course.objects.all().filter(course_id = (Curriculum.objects.all().filter(sem=course_list[2])))
+    #get_course_list_3 = Course.objects.all().filter(course_id = (Curriculum.objects.all().filter(sem=course_list[3])))
+    #get_courses = list(chain(get_course_list, get_course_list_1, get_course_list_2, get_course_list_3))
+    print("sdsd")
+    print(get_courses)
+    #if(course_list[0]==1):
+    #    course_list = [2, 4, 6, 8]
+    #get_course_list = Course.objects.all().filter(course_id = (Curriculum.objects.all().filter(sem=course_list[0])))
+    #get_course_list_1 = Course.objects.all().filter(course_id = (Curriculum.objects.all().filter(sem=course_list[1])))
+    #get_course_list_2 = Course.objects.all().filter(course_id = (Curriculum.objects.all().filter(sem=course_list[2])))
+    #get_course_list_3 = Course.objects.all().filter(course_id = (Curriculum.objects.all().filter(sem=course_list[3])))
+    #this_sem_courses = list(chain(get_course_list, get_course_list_1, get_course_list_2, get_course_list_3))
+    print("sdsdasasasdad")
+    print(this_sem_courses)
 
 
     print("Courses>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.", get_courses)
 
-    # print("Courses>>>>>>>>>>>.", courses)
-    # print(calendar)
+    #print("Courses>>>>>>>>>>>.", courses)
+    #print(calendar)
     try:
-        senator_des = Designation.objects.get(name='senate')
-        convenor_des = Designation.objects.get(name='Convenor')
-        coconvenor_des = Designation.objects.get(name='Co Convenor')
-        dean_des = Designation.objects.get(name='Dean')
-        senates = ExtraInfo.objects.filter(designation=senator_des)
-        Convenor = ExtraInfo.objects.filter(designation=convenor_des)
-        CoConvenor = ExtraInfo.objects.filter(designation=coconvenor_des)
-        Dean = ExtraInfo.objects.get(designation=dean_des)
-        students = Student.objects.filter(id__in=senates)
-        meetings = Meeting.objects.all()
-        student = Student.objects.all()
+        # senator_des = Designation.objects.get(name='senate')
+        # convenor_des = Designation.objects.get(name='Convenor')
+        # coconvenor_des = Designation.objects.get(name='Co Convenor')
+        # dean_des = Designation.objects.get(name='Dean')
+        # senates = ExtraInfo.objects.filter(designation=senator_des)
+        # Convenor = ExtraInfo.objects.filter(designation=convenor_des)
+        # CoConvenor = ExtraInfo.objects.filter(designation=coconvenor_des)
+        # Faculty = ExtraInfo.objects.filter(user_type='faculty')
+        # Dean = ExtraInfo.objects.get(designation=dean_des)
+        # students = Student.objects.filter(id__in=senates)
+        # meetings = Meeting.objects.all()
+        # student = Student.objects.all()
         extra = ExtraInfo.objects.all()
         courses = Course.objects.all()
-        timetable = Timetable.objects.all()
+        acad_timetable = Timetable.objects.all()
+        print("here is tme table")
+        print(acad_timetable)
         exam_t = Exam_timetable.objects.all()
-        grade = Grades.objects.all()
+        # grade = Grades.objects.all()
     except:
-        senates = ""
-        students = ""
-        Convenor = ""
-        CoConvenor = ""
-        meetings = ""
-        Dean = ""
-        student = ""
-        grade = ""
+        print("chala h nhi")
+        # senates = ""
+        # students = ""
+        # Convenor = ""
+        # CoConvenor = ""
+        # Faculty = ""
+        # meetings = ""
+        # Dean = ""
+        # student = ""
+        # grade = ""
         courses = ""
         extra = ""
         exam_t = ""
-        timetable = ""
+        acad_timetable = ""
+        # curriculum = ""
     pass
 
     context = {
-         'senates': senates,
-         'students': students,
-         'Convenor': Convenor,
-         'CoConvenor': CoConvenor,
-         'meetings': meetings,
-         'minuteForm': minuteForm,
-         'acadTtForm': acadTtForm,
-         'examTtForm': examTtForm,
-         'Dean': Dean,
-         'student': student,
+         # 'senates': senates,
+         # 'students': students,
+         # 'Convenor': Convenor,
+         # 'CoConvenor': CoConvenor,
+         # 'meetings': meetings,
+         # 'minuteForm': minuteForm,
+         # 'acadTtForm': acadTtForm,
+         # 'examTtForm': examTtForm,
+         # 'Dean': Dean,
+         # 'student': student,
          'extra': extra,
-         'grade': grade,
+         # 'grade': grade,
          'courses': courses,
-         'exam': exam_t,
-         'timetable': timetable,
-         'academic_calendar': calendar,
-         'opt_courses': opt_courses,
-         'next_sem_course': get_courses,
-         'this_sem_course': this_sem_courses,
+         'exam_t': exam_t,
+         'acad_timetable': acad_timetable,
+         # 'academic_calendar': calendar,
+         # #'opt_courses': opt_courses,
+         # 'next_sem_course': get_courses,
+         # 'this_sem_course': this_sem_courses,
+         # 'curriculum': curriculum,
+         # 'Faculty' : Faculty,
     }
     return render(request, "ais/ais.html", context)
 
@@ -910,11 +947,21 @@ def add_timetable(request):
     acadTtForm = AcademicTimetableForm()
     if request.method == 'POST' and request.FILES:
         acadTtForm = AcademicTimetableForm(request.POST, request.FILES)
+        print("s1")
         if acadTtForm.is_valid():
             acadTtForm.save()
-            return HttpResponse('sucess')
-    else:
-        return HttpResponse('not uploaded')
+            return HttpResponseRedirect('/aims/')
+
+    return HttpResponse('not uploaded')
+
+
+    # if request.method == 'POST' and request.FILES['time_table']:
+    #     myfile = request.FILES['time_table']
+    #     fs = FileSystemStorage()
+    #     filename = fs.save(myfile.name, myfile)
+        
+        
+    # return HttpResponseRedirect('/aims/')
 
 
 def add_exam_timetable(request):
@@ -927,12 +974,15 @@ def add_exam_timetable(request):
     @variables:
         examTtForm - data of delete dictionary in post request
     """
+    examTtForm = ExamTimetableForm()
     if request.method == 'POST' and request.FILES:
         examTtForm = ExamTimetableForm(request.POST, request.FILES)
         if examTtForm.is_valid():
-            print("kkk")
             examTtForm.save()
-    return HttpResponseRedirect('/aims/')
+            return HttpResponseRedirect('/aims/')
+
+    return HttpResponse('not uploaded')
+
 
 def delete_timetable(request):
     """
@@ -949,7 +999,7 @@ def delete_timetable(request):
         data = request.POST['delete']
         t = Timetable.objects.get(time_table=data)
         t.delete()
-        return HttpResponse("TimeTable Deleted")
+        return HttpResponseRedirect('/aims/')
 
 
 def delete_exam_timetable(request):
@@ -1038,6 +1088,9 @@ def update_calendar(request):
         get_calendar_details.to_date = to_date
         get_calendar_details.save()
         return HttpResponseRedirect('/academic-procedures/')
+
+
+
 
 def add_optional(request):
     """

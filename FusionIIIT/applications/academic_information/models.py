@@ -15,6 +15,14 @@ class Constants:
         ('absent', 'absent')
     )
 
+    BRANCH = (
+        ('CSE','CSE'),
+        ('ECE','ECE'),
+        ('ME','ME'),
+        ('Design','Design'),
+        ('Common','Common'),
+    )
+
     PROGRAMME = (
         ('B.Tech', 'B.Tech'),
         ('B.Des', 'B.Des'),
@@ -43,10 +51,23 @@ class Constants:
         ('None', 'None')
     )
 
+    COURSE_TYPE = (
+        ('Professional Core', 'Professional Core'),
+        ('Professional Elective', 'Professional Elective'),
+        ('Professional Lab', 'Professional Lab'),
+        ('Engineering Science', 'Engineering Science'),
+        ('Natural Science', 'Natural Science'),
+        ('Humanities', 'Humanities'),
+        ('Design', 'Design'),
+        ('Manufacturing', 'Manufacturing'),
+        ('Management Science', 'Management Science'),
+    )
+
 
 class Student(models.Model):
     id = models.OneToOneField(ExtraInfo, on_delete=models.CASCADE, primary_key=True)
     programme = models.CharField(max_length=10, choices=Constants.PROGRAMME)
+    batch = models.IntegerField(default=2016)
     cpi = models.FloatField(default=0)
     category = models.CharField(max_length=10, choices=Constants.CATEGORY, null=False)
     father_name = models.CharField(max_length=40, default='')
@@ -63,17 +84,59 @@ class Student(models.Model):
 class Course(models.Model):
     course_id = models.CharField(max_length=100, unique=True)
     course_name = models.CharField(max_length=100)
-    sem = models.IntegerField()
     credits = models.IntegerField()
-    optional = models.BooleanField(default=False)
-    acad_selection = models.BooleanField(default=False)
+    course_details = models.TextField(max_length=200)
 
     class Meta:
         db_table = 'Course'
-        unique_together = ('course_id', 'course_name', 'sem')
+        unique_together = ('course_id', 'course_name')
 
     def __str__(self):
         return self.course_name
+
+
+class Curriculum(models.Model):
+    curriculum_id = models.AutoField(primary_key=True)
+    course_id = models.ForeignKey(Course)
+    course_type = models.CharField(choices=Constants.COURSE_TYPE, max_length=20)
+    programme = models.CharField(choices=Constants.PROGRAMME, max_length=10)
+    branch = models.CharField(choices=Constants.BRANCH, max_length=10, default='Common')
+    batch = models.IntegerField()
+    sem = models.IntegerField()
+
+    class Meta:
+        db_table = 'Curriculum'
+
+    def __str__(self):
+        return str(self.curriculum_id)
+
+
+class Instructor(models.Model):
+    curriculum_id = models.ForeignKey(Curriculum, on_delete=models.CASCADE)
+    instructor_id = models.ForeignKey(ExtraInfo, on_delete=models.CASCADE)
+
+    class Meta:
+        db_table = 'Instructor'
+        unique_together = ('curriculum_id', 'instructor_id')
+
+    def __self__(self):
+        return '{} - {}'.format(self.curriculum_id, self.instructor_id)
+
+
+class Student_attendance(models.Model):
+    student_id = models.ForeignKey(Student)
+#    course_id = models.ForeignKey(Course)
+#    attend = models.CharField(max_length=6, choices=Constants.ATTEND_CHOICES)
+    instructor_id = models.ForeignKey(Instructor, on_delete=models.CASCADE)
+#    curriculum_id = models.ForeignKey(Curriculum, on_delete=models.CASCADE)
+    date = models.DateField()
+    present = models.BooleanField(default=False)
+
+    class Meta:
+        db_table = 'Student_attendance'
+
+    def __self__(self):
+        return self.course_id
 
 
 class Meeting(models.Model):
@@ -125,33 +188,6 @@ class Grades(models.Model):
         db_table = 'Grades'
 
 
-class Student_attendance(models.Model):
-    student_id = models.ForeignKey(Student)
-    course_id = models.ForeignKey(Course)
-#    attend = models.CharField(max_length=6, choices=Constants.ATTEND_CHOICES)
-    date = models.DateField(auto_now=True)
-    present_attend = models.IntegerField(default=0)
-    total_attend = models.IntegerField(default=0)
-
-    class Meta:
-        db_table = 'Student_attendance'
-
-    def __self__(self):
-        return self.course_id
-
-
-class Instructor(models.Model):
-    course_id = models.ForeignKey(Course, on_delete=models.CASCADE)
-    instructor_id = models.ForeignKey(ExtraInfo, on_delete=models.CASCADE)
-
-    class Meta:
-        db_table = 'Instructor'
-        unique_together = ('course_id', 'instructor_id')
-
-    def __self__(self):
-        return '{} - {}'.format(self.course_id, self.instructor_id)
-
-
 class Spi(models.Model):
     sem = models.IntegerField()
     student_id = models.ForeignKey(Student, on_delete=models.CASCADE)
@@ -167,7 +203,7 @@ class Spi(models.Model):
 
 class Timetable(models.Model):
     upload_date = models.DateTimeField(auto_now_add=True)
-    time_table = models.FileField(upload_to='Administrator/academic_information/')
+    time_table = models.FileField(upload_to='Academic_information/Timetable')
     year = models.IntegerField(default="2015")
     programme = models.CharField(max_length=30, default="B.Tech")
 
@@ -177,7 +213,7 @@ class Timetable(models.Model):
 
 class Exam_timetable(models.Model):
     upload_date = models.DateField(auto_now_add=True)
-    exam_time_table = models.FileField(upload_to='Administrator/academic_information/')
+    exam_time_table = models.FileField(upload_to='Academic_information/Exam_timetable')
     year = models.IntegerField(default="2015")
     programme = models.CharField(max_length=30, default="B.Tech")
 
